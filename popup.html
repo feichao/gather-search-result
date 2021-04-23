@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gather Search Result</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="container">
+    <iframe name="iframe-invisible"></iframe>
+    <form action="#" target="iframe-invisible" autocomplete="off">
+      <div class="item-wrapper">
+        <label for="keys-input">Search Keywords</label>
+        <div class="keys-content">
+          <input id="keys-input" required placeholder="search keywords">
+          <ul id="keys-list" class="keys-list"></ul>
+        </div>
+      </div>
+      <div class="item-wrapper">
+        <label for="rates-input">Result Ratings</label>
+        <div class="rates-content">
+          <input id="rates-input" type="number" required min="1" max="5" value="3" placeholder="rate of result">
+        </div>
+      </div>
+      <div class="item-wrapper item-actions-wrapper">
+        <a href="#">Goto Gather List</a>
+        <button id="confirm" submit>Confirm</button>
+      </div>
+    </form>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>

@@ -3,13 +3,15 @@
   "description": "Gather what you search with search eagine~",
   "version": "1.0",
   "manifest_version": 3,
-  "background": {},
+  "background": {
+    "service_worker": "background.js"
+  },
   "icons":{
 		"16": "fav.png",
 		"48": "fav.png",
 		"128": "fav.png"
 	},
-  "browser_action": {
+  "action": {
     "default_icon": "fav.png",
     "default_title": "Gather Search Result",
     "default_popup": "popup.html"
@@ -21,6 +23,7 @@
     "run_at": "document_start"
   }],
   "permissions": [
+    "tabs",
     "storage"
   ],
   "homepage_url": "https://github.com/feichao/gather-search-result"
