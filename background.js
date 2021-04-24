@@ -14,15 +14,17 @@ const enginesKey = Object.keys(engines);
 function getSearchKeywords(url, key) {
   const urlO = new URL(url);
   const searchs = new URLSearchParams(urlO.search);
+  console.log(searchs, searchs.get(key));
   return searchs.get(key);
 }
 
 function updateSearchKeywords(url) {
   if(url) {
     const urlO = new URL(url);
-    const engineKey = enginesKey.filter(k => urlO.origin.match(new RegExp(k)));
-    if(engineKey.length > 0) {
-     return engines[engineKey](url);
+    const engineKeys = enginesKey.filter(k => urlO.origin.match(new RegExp(k)));
+    if(engineKeys.length > 0) {
+      console.log('engines[engineKeys[0]](url) => ', engines[engineKeys[0]](url));
+      return engines[engineKeys[0]](url);
     }
   }
 }
