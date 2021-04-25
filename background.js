@@ -9,23 +9,40 @@ const engines = {
     return getSearchKeywords(url, 'q');
   }
 };
+
 const enginesKey = Object.keys(engines);
+const enginesKeyRE = enginesKey.map(k => new RegExp(k, 'i'));
 
 function getSearchKeywords(url, key) {
   const urlO = new URL(url);
   const searchs = new URLSearchParams(urlO.search);
-  console.log(searchs, searchs.get(key));
   return searchs.get(key);
 }
 
 function updateSearchKeywords(url) {
-  if(url) {
-    const urlO = new URL(url);
-    const engineKeys = enginesKey.filter(k => urlO.origin.match(new RegExp(k)));
-    if(engineKeys.length > 0) {
-      console.log('engines[engineKeys[0]](url) => ', engines[engineKeys[0]](url));
-      return engines[engineKeys[0]](url);
+  const fun = getSearchKeysFun(url);
+  const searchKey = fun(url);
+  console.log('searchKey => ', searchKey);
+  return searchKey;
+}
+
+function getSearchKeysFun(url) {
+  const _ = () => {};
+  try {
+    if (!url) {
+      return _;
     }
+
+    const urlHost = new URL(url).host;
+    for(let i = 0; i < enginesKeyRE.length; i++) {
+      if (enginesKeyRE[i].test(urlHost)) {
+        return engines[enginesKey[i]];
+      }
+    }
+    return _;
+  } catch(exception) {
+    console.error('getSearchKeysFun => ', exception);
+    return _;
   }
 }
 
