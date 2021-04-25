@@ -13,6 +13,23 @@ const engines = {
 const enginesKey = Object.keys(engines);
 const enginesKeyRE = enginesKey.map(k => new RegExp(k, 'i'));
 
+const getSearchKeys = function() {
+  return new Promise((resolve, reject) => {
+    chrome.storage.sync.get('gatherKeys', function(data) {
+      const keys = Array.isArray(data.gatherKeys) ? data.gatherKeys : [];
+      console.log('keys => ', keys);
+      resolve(keys);
+    });
+  });
+};
+const setSearchKeys = function(gatherKeys) {
+  return new Promise((resolve, reject) => {
+    chrome.storage.sync.set({ gatherKeys }, function(data) {
+      resolve();
+    });
+  });
+};
+
 function getSearchKeywords(url, key) {
   const urlO = new URL(url);
   const searchs = new URLSearchParams(urlO.search);
@@ -22,8 +39,11 @@ function getSearchKeywords(url, key) {
 function updateSearchKeywords(url) {
   const fun = getSearchKeysFun(url);
   const searchKey = fun(url);
-  console.log('searchKey => ', searchKey);
-  return searchKey;
+  if (searchKey) {
+    getSearchKeys().then(keys => {
+      setSearchKeys(keys.unshift(searchKey));
+    });
+  }
 }
 
 function getSearchKeysFun(url) {
@@ -47,10 +67,10 @@ function getSearchKeysFun(url) {
 }
 
 chrome.tabs.onCreated.addListener(function(tab) {
-  console.log(updateSearchKeywords(tab.url));
+  updateSearchKeywords(tab.url)
 });
 
 chrome.tabs.onUpdated.addListener(function(tabId, changeInfo) {
-  console.log(updateSearchKeywords(changeInfo.url));
+  updateSearchKeywords(changeInfo.url)
 });
 
