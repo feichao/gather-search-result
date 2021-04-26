@@ -1,3 +1,5 @@
+const MAX_KEYS = 10;
+
 const engines = {
   'google.com': function(url) {
     return getSearchKeywords(url, 'q');
@@ -17,7 +19,6 @@ const getSearchKeys = function() {
   return new Promise((resolve, reject) => {
     chrome.storage.sync.get('gatherKeys', function(data) {
       const keys = Array.isArray(data.gatherKeys) ? data.gatherKeys : [];
-      console.log('keys => ', keys);
       resolve(keys);
     });
   });
@@ -41,7 +42,7 @@ function updateSearchKeywords(url) {
   const searchKey = fun(url);
   if (searchKey) {
     getSearchKeys().then(keys => {
-      setSearchKeys(keys.unshift(searchKey));
+      setSearchKeys([searchKey, ...keys].slice(0, MAX_KEYS));
     });
   }
 }
@@ -67,10 +68,10 @@ function getSearchKeysFun(url) {
 }
 
 chrome.tabs.onCreated.addListener(function(tab) {
-  updateSearchKeywords(tab.url)
+  updateSearchKeywords(tab.url);
 });
 
 chrome.tabs.onUpdated.addListener(function(tabId, changeInfo) {
-  updateSearchKeywords(changeInfo.url)
+  updateSearchKeywords(changeInfo.url);
 });
 

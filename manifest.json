@@ -26,5 +26,6 @@
     "tabs",
     "storage"
   ],
+  "options_page": "index.html",
   "homepage_url": "https://github.com/feichao/gather-search-result"
 }
