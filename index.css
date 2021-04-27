@@ -52,3 +52,38 @@ body {
 .container .results {
   flex: 1;
 }
+
+.keys-list,
+.results-list {
+  margin: 0;
+  list-style: none;
+  padding: 16px;
+}
+
+.keys-list li,
+.results-list li {
+  cursor: pointer;
+  padding: 16px;
+}
+
+.keys-list li:nth-child(ODD) {
+  background: #f0f0f0;
+}
+
+.keys-list li:hover {
+  background: #f0f0f0;
+}
+
+.keys-list li.selected {
+  background: #e7e7e7;
+}
+
+.keys-list li .key {
+  font-size: 16px;
+}
+
+.keys-list li .create-date {
+  color: #999;
+  font-size: 12px;
+  margin-top: 8px;
+}

@@ -4,6 +4,7 @@
   const resultsListEl = document.getElementById('results-list');
 
   let selectedKey = null;
+  let searchKey = '';
   let inputTimer = null;
 
    /**
@@ -26,16 +27,16 @@
     });
   };
 
-  function render(key) {
-    const keyReg = new RegExp(key, 'ig');
+  function render() {
+    const keyReg = new RegExp(searchKey, 'ig');
     getGatherResults().then(gatherResults => {
       const resultsArray = Object.keys(gatherResults).map(key => ({
         key,
         ...gatherResults[key]
-      })).sort((r1, r2) => r1.createDate < r2.createDate).filter(r => !key || keyReg.test(r.key));
+      })).sort((r1, r2) => r1.createDate < r2.createDate).filter(r => !searchKey || keyReg.test(r.key));
 
       if (resultsArray.length > 0) {
-        selectedKey = resultsArray[0].key;
+        selectedKey = selectedKey || resultsArray[0].key;
         keysListEl.innerHTML = renderKeysHtml(selectedKey, resultsArray);
         resultsListEl.innerHTML = renderResultsHtml(gatherResults[selectedKey].results);
       }
@@ -71,7 +72,8 @@
     const key = searchKeyEl.value;
     clearTimeout(inputTimer);
     inputTimer = setTimeout(() => {
-      render(key);
+      searchKey = key;
+      render();
     }, 300);
   });
 
@@ -85,8 +87,8 @@
     }
 
     if (target) {
-      const _key = target.dataset['key'];
-      render(_key);
+      selectedKey = target.dataset['key'];
+      render();
     }
   });
 
