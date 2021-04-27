@@ -5,8 +5,23 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Document</title>
+  <link rel="stylesheet" href="index.css">
 </head>
 <body>
-  index
+  <div class="header">
+    <div class="input-wrapper">
+      <input id="search-keys" placeholder="search results">
+      <img src="assets/search.svg" alt="search icon">
+    </div>
+  </div>
+  <div class="container">
+    <div class="keys">
+      <ul id="keys-list" class="keys-list"></ul>
+    </div>
+    <div id="r-results" class="results">
+      <ul id="results-list" class="results-list"></ul>
+    </div>
+  </div>
+  <script src="index.js"></script>
 </body>
 </html>

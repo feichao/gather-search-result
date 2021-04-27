@@ -12,23 +12,26 @@
 
   /**
    * gatherResults
-   * [{
-   *    key
-   *    rate
-   *    result
-   *    createDate
-   * }]
+   * {
+   *    [key]: {
+   *      createDate
+   *      results: [{
+   *        rate
+   *        resultURL
+   *        createDate
+   *      }]
+   *    }
    */
   function getGatherResults() {
     return new Promise((resolve, reject) => {
       chrome.storage.sync.get('gatherResults', function(data) {
-        const keys = Array.isArray(data.gatherResults) ? data.gatherResults : [];
-        resolve(keys);
+        resolve(data.gatherResults || {});
       });
     });
   };
 
   function setGatherResults(gatherResults) {
+    console.log('gatherResults => ', gatherResults);
     return new Promise((resolve, reject) => {
       chrome.storage.sync.set({ gatherResults }, function(data) {
         resolve();
@@ -66,13 +69,34 @@
       }, function(tabs) {
         if (Array.isArray(tabs) && tabs.length > 0) {
           const resultURL = tabs[0].url;
-          getGatherResults().then(rets => {
-            setGatherResults([{
-              key: searchKey,
+          getGatherResults().then(function(rets) {
+            const r = {
               rate: searchRate,
-              result: resultURL,
+              resultURL,
               createDate: +new Date,
-            }, ...rets].slice(0, MAX_RESULTS));
+            };
+            if (rets[searchKey] && Array.isArray(rets[searchKey].results)) {
+              let isExist = false;
+
+              const rs = rets[searchKey].results;
+              for (let i = 0; i < rs.length; i++) {
+                if (resultURL === rs[i].resultURL) {
+                  rets[searchKey].results.splice(i, 1, r);
+                  isExist = true;
+                  break;
+                }
+              }
+              
+              if (!isExist) {
+                rets[searchKey].results.push(r);
+              }
+            } else {
+              rets[searchKey] = {
+                createDate: +new Date,
+                results: [r]
+              };
+            }
+            setGatherResults(rets);
           })
         }
       });
@@ -80,9 +104,7 @@
 
     gotoGatherList.addEventListener('click', function(event) {
       event.preventDefault();
-      chrome.runtime.openOptionsPage(function() {
-        
-      });
+      chrome.runtime.openOptionsPage(function() {});
     });
 
     searchKeyEle.addEventListener('click', function(event) {

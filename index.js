@@ -1,70 +1,94 @@
-// (function () {
-//   document.addEventListener('DOMContentLoaded', function (event) {
-//     const searchKeys = [
-//       'CSS height',
-//       'input select',
-//       '语雀商业逻辑',
-//       'CSS height',
-//       'input select',
-//       '语雀商业逻辑',
-//       'CSS height',
-//       'input select',
-//       '语雀商业逻辑'
-//     ];
+(function() {
+  const searchKeyEl = document.getElementById('search-keys');
+  const keysListEl = document.getElementById('keys-list');
+  const resultsListEl = document.getElementById('results-list');
 
-//     const html = `
-//       <div id="--plugin-gather-search-result--">
-//         <iframe name="--PGSR-iframe-invisible--"></iframe>
-//         <form action="#" target="--PGSR-iframe-invisible--" autocomplete="off">
-//           <div class="--PGSR-item-wrapper--">
-//             <label for="--PGSR-keys-input--">Keys</label>
-//             <div class="--PGSR-keys-content--">
-//               <input id="--PGSR-keys-input--" required placeholder="search keys">
-//               <ul id="--PGSR-keys-list--">
-//                 ${searchKeys.map((key, index) => `<li data-index="${index}">${key}</li>`).join('')}
-//               </ul>
-//             </div>
-//           </div>
-//           <div class="--PGSR-item-wrapper--">
-//             <label for="--PGSR-rates-input--">Rate</label>
-//             <div class="--PGSR-rates-content--">
-//               <input id="--PGSR-rates-input--" type="number" required min="1" max="5" value="3" placeholder="rate of result">
-//             </div>
-//           </div>
-//           <div class="--PGSR-item-wrapper-- --PGSR-item-actions-wrapper--">
-//             <button id="--PGSR-confirm--" submit>Confirm</button>
-//           </div>
-//         </form>
-//       </div>`;
-//     const wrapper = document.createElement('div');
-//     wrapper.id = '--plugin-gather-result-wrapper--'
-//     wrapper.innerHTML = html;
-//     document.body.append(wrapper);
-//     wrapper.addEventListener('click', function() {
-//       searchKeyList.style.display = 'none';
-//     });
+  let selectedKey = null;
+  let inputTimer = null;
 
-//     const confirmEle = document.getElementById('--PGSR-confirm--');
-//     const searchKeyEle = document.getElementById('--PGSR-keys-input--');
-//     const searchRateEle = document.getElementById('--PGSR-rates-input--');
-//     const searchKeyList = document.getElementById('--PGSR-keys-list--');
-//     confirmEle.addEventListener('click', function(event) {
-//       const searchKey = searchKeyEle.value;
-//       const searchRate = searchRateEle.value;
-//       console.log('key + rate => ', searchKey, searchRate);
-//     });
+   /**
+   * gatherResults
+   * {
+   *    [key]: {
+   *      createDate
+   *      results: [{
+   *        rate
+   *        resultURL
+   *        createDate
+   *      }]
+   *    }
+   */
+   function getGatherResults() {
+    return new Promise((resolve, reject) => {
+      chrome.storage.sync.get('gatherResults', function(data) {
+        resolve(data.gatherResults || {});
+      });
+    });
+  };
 
-//     searchKeyEle.addEventListener('click', function(event) {
-//       event.stopPropagation();
-//       searchKeyList.style.display = 'block';
-//     });
+  function render(key) {
+    const keyReg = new RegExp(key, 'ig');
+    getGatherResults().then(gatherResults => {
+      const resultsArray = Object.keys(gatherResults).map(key => ({
+        key,
+        ...gatherResults[key]
+      })).sort((r1, r2) => r1.createDate < r2.createDate).filter(r => !key || keyReg.test(r.key));
 
-//     searchKeyList.addEventListener('click', function(event) {
-//       const target = event.target;
-//       const index = target.dataset.index;
-//       const searchKey = searchKeys[index];
-//       searchKeyEle.value = searchKey;
-//       searchKeyList.style.display = 'none';
-//     });
-//   });
-// })();
+      if (resultsArray.length > 0) {
+        selectedKey = resultsArray[0].key;
+        keysListEl.innerHTML = renderKeysHtml(selectedKey, resultsArray);
+        resultsListEl.innerHTML = renderResultsHtml(gatherResults[selectedKey].results);
+      }
+    });
+  }
+
+  const renderKeysHtml = function(selectedKey, resultsArray) {
+    return resultsArray.map(r => `
+      <li data-key="${r.key}" class="${r.key === selectedKey ? 'selected' : ''}">
+        <div class="key">${r.key}</div>
+        <div class="create-date">${new Date(r.createDate)}</div>
+      </li>
+    `).join('');
+  };
+
+  const renderResultsHtml = function(results) {
+    return results.map(r => `
+      <li>
+        <div class="url">${r.resultURL}</div>
+        <div class="date">${r.rate}</div>
+        <div class="create-date">${new Date(r.createDate)}</di>
+      </li>
+    `).join('');
+  };
+
+  chrome.storage.onChanged.addListener(function(cahnges, area) {
+    if (area === 'sync') {
+      render();
+    }
+  });
+
+  searchKeyEl.addEventListener('change', (event) => {
+    const key = searchKeyEl.value;
+    clearTimeout(inputTimer);
+    inputTimer = setTimeout(() => {
+      render(key);
+    }, 300);
+  });
+
+  keysListEl.addEventListener('click', (event) => {
+    let target = event.target;
+    while(true) {
+      if((target.tagName || '').toUpperCase() === 'LI' || target === null) {
+        break;
+      }
+      target = target.parentElement;
+    }
+
+    if (target) {
+      const _key = target.dataset['key'];
+      render(_key);
+    }
+  });
+
+  render();
+})();
