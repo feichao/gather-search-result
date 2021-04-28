@@ -19,7 +19,7 @@
         </div>
       </div>
       <div class="item-wrapper">
-        <label for="rates-input">Result Ratings</label>
+        <label>Result Ratings</label>
         <div class="rates-content">
           <ul id="rates-star-list" class="rates-star-list">
             <li>
@@ -65,11 +65,16 @@
           </ul>
         </div>
       </div>
+      <div class="item-wrapper">
+        <label>Search Result</label>
+        <div id="result-content" class="result-content"></div>
+      </div>
       <div class="item-wrapper item-actions-wrapper">
         <a id="goto-gather-list" href="#">Goto Gather List</a>
-        <button id="confirm" submit>Confirm</button>
+        <button id="confirm" submit>Save</button>
       </div>
     </form>
+    <div id="loading" class="loading show">Loading...</div>
   </div>
   <script src="popup.js"></script>
 </body>

@@ -6,7 +6,7 @@ body {
   font-size: 12px;
   margin: 16px 12px;
   min-height: 150px;
-  width: 300px;
+  width: 278px;
 }
 
 iframe[name="iframe-invisible"] {
@@ -34,7 +34,7 @@ iframe[name="iframe-invisible"] {
   box-shadow: 0 2px 5px 0 #ccc;
   box-sizing: border-box;
   margin: 0;
-  max-height: 120px;
+  max-height: 180px;
   overflow: auto;
   padding: 2px 6px;
   position: absolute;
@@ -56,12 +56,13 @@ iframe[name="iframe-invisible"] {
 
 .rates-star-list {
   cursor: pointer;
-  display: inline-block;
+  display: flex;
+  list-style: none;
   margin: 0;
   padding: 0;
 }
 .rates-star-list li {
-  display: inline-block;
+  flex: 1;
 }
 .rates-star-list li img {
   height: 20px;
@@ -89,8 +90,21 @@ iframe[name="iframe-invisible"] {
   color: initial;
   display: inline-block;
   margin: 0;
-  padding: 8px 12px;
+  padding: 8px 6px;
   width: 100%;
+}
+
+.result-content {
+  align-items: center;
+  background: #f5f5f5;
+  border-radius: 4px;
+  display: flex;
+  padding: 8px 6px;
+  margin: 8px 0;
+}
+.result-content img {
+  margin-right: 3px;
+  width: 16px;
 }
 
 .item-actions-wrapper {
@@ -109,6 +123,33 @@ iframe[name="iframe-invisible"] {
   margin: 0;
   padding: 6px 10px;
 }
+.item-actions-wrapper button.saved {
+  background: none !important;
+  border-color: transparent !important;
+  color: blue;
+  cursor: initial;
+}
 .item-actions-wrapper button:hover {
   background: #eee;
+}
+.item-actions-wrapper button:active {
+  background: #e0e0e0;
+}
+
+.loading {
+  align-items: center;
+  background-color: rgba(255, 255, 255, 0.64);
+  bottom: 0;
+  color: #333;
+  display: none;
+  font-size: 16px;
+  justify-content: center;
+  left: 0;
+  position: fixed;
+  right: 0;
+  top: 0;
+}
+
+.loading.show {
+  display: flex;
 }

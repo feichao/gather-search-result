@@ -1,5 +1,34 @@
 (function () {
+  let resultURL = '';
+  let resultTitle = '';
+  let resultFavIcon = '';
+  let isSaved = false;
+
+  chrome.tabs.query({
+    active: true,
+    currentWindow: true
+  }, function(tabs) {
+    if (Array.isArray(tabs) && tabs.length > 0) {
+      resultURL = tabs[0].url;
+      resultTitle = tabs[0].title;
+      resultFavIcon = tabs[0].favIconUrl;
+      document.getElementById('loading').className = 'loading';
+      document.getElementById('result-content').innerHTML = `
+        <img src="${resultFavIcon}" alt="">
+        <span>${resultTitle}</span>
+      `;
+    }
+  });
+
   const MAX_RESULTS = 1000;
+  const form = document.getElementById('form');
+  const confirmEle = document.getElementById('confirm');
+  const gotoGatherList = document.getElementById('goto-gather-list');
+  const searchKeyEle = document.getElementById('keys-input');
+  const searchRateEle = document.getElementById('rates-star-list');
+  const searchKeyList = document.getElementById('keys-list');
+
+  let rate = 4;
 
   function getGatherKeys() {
     return new Promise((resolve, reject) => {
@@ -51,100 +80,106 @@
     return target;
   }
 
-  document.addEventListener('DOMContentLoaded', function (event) {
-    const confirmEle = document.getElementById('confirm');
-    const gotoGatherList = document.getElementById('goto-gather-list');
-    const searchKeyEle = document.getElementById('keys-input');
-    const searchRateEle = document.getElementById('rates-star-list');
-    const searchKeyList = document.getElementById('keys-list');
+  function setSatrRate(rate) {
+    const lis = searchRateEle.children;
+    for(let i = 0; i < lis.length; i++) {
+      lis[i].className = i <= rate ? 'active' : '';
+    }
+  }
 
-    chrome.storage.onChanged.addListener(function(data) {
-      getGatherKeys().then(keys => {
-        searchKeyList.innerHTML = keys.map((key) => `<li>${key}</li>`).join('');
-      })
-    });
-    
+  setSatrRate(rate);
+
+  chrome.storage.onChanged.addListener(function(data) {
     getGatherKeys().then(keys => {
       searchKeyList.innerHTML = keys.map((key) => `<li>${key}</li>`).join('');
     })
+  });
+  
+  getGatherKeys().then(keys => {
+    searchKeyList.innerHTML = keys.map((key) => `<li>${key}</li>`).join('');
+  })
 
-    document.body.addEventListener('click', function() {
-      searchKeyList.style.display = 'none';
-    });
+  document.body.addEventListener('click', function() {
+    searchKeyList.style.display = 'none';
+  });
 
-    searchRateEle.addEventListener('mouseover', function(event) {
-      const lis = searchRateEle.children;
-      const li = getTargetElement(event.target, 'LI');
-      const index = Array.from(lis).indexOf(li);
-      for(let i = 0; i < lis.length; i++) {
-        lis[i].className = i <= index ? 'active' : '';
-      }
-    });
-    searchRateEle.addEventListener('click', function(event) {
-      const lis = searchRateEle.children;
-      const li = getTargetElement(event.target, 'LI');
-    });
+  searchRateEle.addEventListener('mouseover', function(event) {
+    const lis = searchRateEle.children;
+    const li = getTargetElement(event.target, 'LI');
+    const index = Array.from(lis).indexOf(li);
+    setSatrRate(index);
+  });
+  searchRateEle.addEventListener('mouseleave', function(event) {
+    setSatrRate(rate);
+  });
+  searchRateEle.addEventListener('click', function(event) {
+    const lis = searchRateEle.children;
+    const li = getTargetElement(event.target, 'LI');
+    rate = Array.from(lis).indexOf(li);
+    setSatrRate(rate);
+  });
 
-    confirmEle.addEventListener('click', function(event) {
-      const searchKey = searchKeyEle.value;
-      const searchRate = searchRateEle.value;
-      chrome.tabs.query({
-        active: true,
-        currentWindow: true
-      }, function(tabs) {
-        if (Array.isArray(tabs) && tabs.length > 0) {
-          const resultURL = tabs[0].url;
-          const resultTitle = tabs[0].title;
-          const resultFavIcon = tabs[0].favIconUrl;
-          getGatherResults().then(function(rets) {
-            const r = {
-              rate: searchRate,
-              resultURL,
-              resultTitle,
-              resultFavIcon,
-              createDate: +new Date,
-            };
-            if (rets[searchKey] && Array.isArray(rets[searchKey].results)) {
-              let isExist = false;
+  confirmEle.addEventListener('click', function(event) {
+    const searchKey = searchKeyEle.value;
+    if (!searchKey || isSaved) {
+      return;
+    }
 
-              const rs = rets[searchKey].results;
-              for (let i = 0; i < rs.length; i++) {
-                if (resultURL === rs[i].resultURL) {
-                  rets[searchKey].results.splice(i, 1, r);
-                  isExist = true;
-                  break;
-                }
-              }
-              
-              if (!isExist) {
-                rets[searchKey].results.push(r);
-              }
-            } else {
-              rets[searchKey] = {
-                createDate: +new Date,
-                results: [r]
-              };
-            }
-            setGatherResults(rets);
-          })
+    getGatherResults().then(function(rets) {
+      const r = {
+        rate,
+        resultURL,
+        resultTitle,
+        resultFavIcon,
+        createDate: +new Date,
+      };
+      if (rets[searchKey] && Array.isArray(rets[searchKey].results)) {
+        let isExist = false;
+
+        const rs = rets[searchKey].results;
+        for (let i = 0; i < rs.length; i++) {
+          if (resultURL === rs[i].resultURL) {
+            rets[searchKey].results.splice(i, 1, r);
+            isExist = true;
+            break;
+          }
         }
-      });
-    });
+        
+        if (!isExist) {
+          rets[searchKey].results.push(r);
+        }
+      } else {
+        rets[searchKey] = {
+          createDate: +new Date,
+          results: [r]
+        };
+      }
+      setGatherResults(rets);
 
-    gotoGatherList.addEventListener('click', function(event) {
-      event.preventDefault();
-      chrome.runtime.openOptionsPage(function() {});
+      isSaved = true;
+      confirmEle.innerText = 'Saved!'
+      confirmEle.className = 'saved';
+      setTimeout(() => {
+        isSaved = false;
+        confirmEle.innerText = 'Save';
+        confirmEle.className = '';
+      }, 3000);
     });
+  });
 
-    searchKeyEle.addEventListener('click', function(event) {
-      event.stopPropagation();
-      searchKeyList.style.display = 'block';
-    });
+  gotoGatherList.addEventListener('click', function(event) {
+    event.preventDefault();
+    chrome.runtime.openOptionsPage(function() {});
+  });
 
-    searchKeyList.addEventListener('click', function(event) {
-      const target = event.target;
-      searchKeyEle.value = target.innerHTML;
-      searchKeyList.style.display = 'none';
-    });
+  searchKeyEle.addEventListener('click', function(event) {
+    event.stopPropagation();
+    searchKeyList.style.display = 'block';
+  });
+
+  searchKeyList.addEventListener('click', function(event) {
+    const target = event.target;
+    searchKeyEle.value = target.innerHTML;
+    searchKeyList.style.display = 'none';
   });
 })();
