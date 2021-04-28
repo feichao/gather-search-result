@@ -11,7 +11,7 @@
     if (Array.isArray(tabs) && tabs.length > 0) {
       resultURL = tabs[0].url;
       resultTitle = tabs[0].title;
-      resultFavIcon = tabs[0].favIconUrl;
+      resultFavIcon = /^http/.test(tabs[0].favIconUrl) ? tabs[0].favIconUrl : 'assets/browser.png';
       document.getElementById('loading').className = 'loading';
       document.getElementById('result-content').innerHTML = `
         <img src="${resultFavIcon}" alt="">
@@ -62,7 +62,6 @@
   };
 
   function setGatherResults(gatherResults) {
-    console.log('gatherResults => ', gatherResults);
     return new Promise((resolve, reject) => {
       chrome.storage.sync.set({ gatherResults }, function(data) {
         resolve();
