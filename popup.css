@@ -54,6 +54,29 @@ iframe[name="iframe-invisible"] {
   background: #eee;
 }
 
+.rates-star-list {
+  cursor: pointer;
+  display: inline-block;
+  margin: 0;
+  padding: 0;
+}
+.rates-star-list li {
+  display: inline-block;
+}
+.rates-star-list li img {
+  height: 20px;
+  width: 20px;
+}
+.rates-star-list li img.star-good {
+  display: none;
+}
+.rates-star-list li.active img.star-normal {
+  display: none;
+}
+.rates-star-list li.active img.star-good {
+  display: initial;
+}
+
 .item-wrapper > label {
   margin: 0;
   width: 42px;

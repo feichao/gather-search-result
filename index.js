@@ -80,7 +80,7 @@
   keysListEl.addEventListener('click', (event) => {
     let target = event.target;
     while(true) {
-      if((target.tagName || '').toUpperCase() === 'LI' || target === null) {
+      if(target === null || (target.tagName || '').toUpperCase() === 'LI') {
         break;
       }
       target = target.parentElement;

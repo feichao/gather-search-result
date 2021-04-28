@@ -17,6 +17,8 @@
    *      createDate
    *      results: [{
    *        rate
+   *        resultFavIcon
+   *        resultTitle
    *        resultURL
    *        createDate
    *      }]
@@ -39,11 +41,21 @@
     });
   };
 
+  function getTargetElement(target, tagName) {
+    while(true) {
+      if(target === null || (target.tagName || '').toUpperCase() === tagName.toUpperCase()) {
+        break;
+      }
+      target = target.parentElement;
+    }
+    return target;
+  }
+
   document.addEventListener('DOMContentLoaded', function (event) {
     const confirmEle = document.getElementById('confirm');
     const gotoGatherList = document.getElementById('goto-gather-list');
     const searchKeyEle = document.getElementById('keys-input');
-    const searchRateEle = document.getElementById('rates-input');
+    const searchRateEle = document.getElementById('rates-star-list');
     const searchKeyList = document.getElementById('keys-list');
 
     chrome.storage.onChanged.addListener(function(data) {
@@ -60,6 +72,19 @@
       searchKeyList.style.display = 'none';
     });
 
+    searchRateEle.addEventListener('mouseover', function(event) {
+      const lis = searchRateEle.children;
+      const li = getTargetElement(event.target, 'LI');
+      const index = Array.from(lis).indexOf(li);
+      for(let i = 0; i < lis.length; i++) {
+        lis[i].className = i <= index ? 'active' : '';
+      }
+    });
+    searchRateEle.addEventListener('click', function(event) {
+      const lis = searchRateEle.children;
+      const li = getTargetElement(event.target, 'LI');
+    });
+
     confirmEle.addEventListener('click', function(event) {
       const searchKey = searchKeyEle.value;
       const searchRate = searchRateEle.value;
@@ -69,10 +94,14 @@
       }, function(tabs) {
         if (Array.isArray(tabs) && tabs.length > 0) {
           const resultURL = tabs[0].url;
+          const resultTitle = tabs[0].title;
+          const resultFavIcon = tabs[0].favIconUrl;
           getGatherResults().then(function(rets) {
             const r = {
               rate: searchRate,
               resultURL,
+              resultTitle,
+              resultFavIcon,
               createDate: +new Date,
             };
             if (rets[searchKey] && Array.isArray(rets[searchKey].results)) {
