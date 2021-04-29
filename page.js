@@ -38,15 +38,27 @@
       const fun = engines[hrefFuns[0]];
       const div = document.createElement('div');
       const fav = chrome.runtime.getURL('fav.png');
+      const close = chrome.runtime.getURL('assets/close.png');
       div.innerHTML = `
-        <div class="--gather-search-result-continue--">
+        <div id="--gather-search-result-continue--" class="--gather-search-result-continue--">
           <a href="${fun(keys)}" target="_blank">
-            <img id="--gather-search-result-continue--img" src="${fav}" alt="FavIcon">
-            <span>continue search "${keys}" with ${engine}</span>
+            <img src="${fav}" alt="FavIcon">
+            <span>continue search "<span class="--gather-search-result-continue--keys">${keys}</span>" with ${engine}</span>
           </a>
+          <div id="--gather-search-result-continue--close" class="--gather-search-result-continue--close">
+            <img src="${close}" alt="close">
+          </div>
         </div>
       `;
       document.body.append(div);
+      setTimeout(() => {
+        document.getElementById('--gather-search-result-continue--close').addEventListener('click', function(event) {
+          event.stopPropagation();
+
+          const wrap = document.getElementById('--gather-search-result-continue--');
+          wrap.remove();
+        });
+      }, 1000);
     }
   }
 })();

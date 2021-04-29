@@ -1,12 +1,13 @@
 .--gather-search-result-continue-- {
   background: black;
   border-radius: 4px;
+  max-width: 240px;
   opacity: .72;
   padding: 8px;
   position: fixed;
-  right: 12px;
-  top: 12px;
-  z-index: 99;
+  right: 16px;
+  top: 16px;
+  z-index: 99999;
 }
 
 .--gather-search-result-continue--:hover {
@@ -22,6 +23,30 @@
 
 .--gather-search-result-continue-- img {
   height: 18px;
-  margin-right: 4px;
+  margin-right: 6px;
   width: 18px;
+}
+
+.--gather-search-result-continue--keys {
+  color: #5dc86a;
+}
+
+.--gather-search-result-continue--close {
+  align-items: center;
+  border-radius: 50%;
+  background: red;
+  cursor: pointer;
+  display: flex;
+  height: 18px;
+  justify-content: center;
+  position: absolute;
+  right: -4px;
+  top: -4px;
+  width: 18px;
+}
+
+.--gather-search-result-continue-- .--gather-search-result-continue--close img {
+  height: 8px;
+  margin: 0;
+  width: 8px;
 }
