@@ -24,7 +24,11 @@
     "matches": ["http://*/*", "https://*/*"],
     "js": ["page.js"],
     "css": ["page.css"],
-    "run_at": "document_start"
+    "run_at": "document_end"
+  }],
+  "web_accessible_resources": [{
+    "resources": ["fav.png"],
+    "matches": ["http://*/*", "https://*/*"]
   }],
   "options_page": "index.html",
   "homepage_url": "https://github.com/feichao/gather-search-result"

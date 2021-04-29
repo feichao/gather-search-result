@@ -72,7 +72,7 @@ const setSearchKeys = function(gatherKeys) {
 
 function getSearchKeywords(url, key) {
   const urlO = new URL(url);
-  const searchs = new URLSearchParams(urlO.search);
+  const searchs = urlO.searchParams;
   return searchs.get(key);
 }
 

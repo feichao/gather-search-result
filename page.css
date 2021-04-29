@@ -1,0 +1,27 @@
+.--gather-search-result-continue-- {
+  background: black;
+  border-radius: 4px;
+  opacity: .72;
+  padding: 8px;
+  position: fixed;
+  right: 12px;
+  top: 12px;
+  z-index: 99;
+}
+
+.--gather-search-result-continue--:hover {
+  opacity: 1;
+}
+
+.--gather-search-result-continue-- a {
+  align-items: center;
+  color: white !important;
+  display: flex;
+  font-size: 14px;
+}
+
+.--gather-search-result-continue-- img {
+  height: 18px;
+  margin-right: 4px;
+  width: 18px;
+}

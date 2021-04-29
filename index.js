@@ -63,14 +63,17 @@
   };
 
   const renderResultsHtml = function(selectedKey, results) {
-    return results.sort((r1, r2) => r2.rate - r1.rate).map((r, i) => `
-      <li>
+    return results.sort((r1, r2) => r2.rate - r1.rate).map((r, i) => {
+      const _gatherParam = window.encodeURI(`${r.engine}^${selectedKey}`);
+      const url = new URL(r.resultURL);
+      url.searchParams.set('__gsr_params', _gatherParam);
+      return `<li>
         <div class="title">
           <img src="${/^http/.test(r.resultFavIcon) ? r.resultFavIcon : 'assets/browser.png'}" alt="ICON">
           <div>${r.resultTitle}</div>
         </div>
         <div class="url">
-          <a href="${r.resultURL}" target="_blank">${r.resultURL}</a>
+          <a href="${url.href}" target="_blank">${r.resultURL}</a>
         </div>
         <div class="rate">${
           new Array(10).fill(0).map((_, i) => {
@@ -85,7 +88,7 @@
         </div>
         <div class="delete" data-key="${selectedKey}" data-index="${i}"><img src="assets/delete.png" alt="DEL"></div>
       </li>
-    `).join('');
+    `}).join('');
   };
 
   chrome.storage.onChanged.addListener(function(cahnges, area) {
