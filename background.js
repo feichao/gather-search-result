@@ -2,14 +2,53 @@ const MAX_KEYS = 10;
 
 const engines = {
   'google.com': function(url) {
-    return getSearchKeywords(url, 'q');
+    return {
+      engine: 'google',
+      key: getSearchKeywords(url, 'q')
+    };
   },
   'baidu.com': function(url) {
-    return getSearchKeywords(url, 'wd');
+    return {
+      engine: 'baidu',
+      key: getSearchKeywords(url, 'wd')
+    };
   },
   'bing.com': function(url) {
-    return getSearchKeywords(url, 'q');
-  }
+    return {
+      engine: 'bing',
+      key: getSearchKeywords(url, 'q')
+    };
+  },
+  'sogou.com': function(url) {
+    return {
+      engine: 'sogou',
+      key: getSearchKeywords(url, 'query')
+    };
+  },
+  'so.com': function(url) {
+    return {
+      engine: 'so.com',
+      key: getSearchKeywords(url, 'q')
+    };
+  },
+  'yahoo.com': function(url) {
+    return {
+      engine: 'yahoo',
+      key: getSearchKeywords(url, 'p')
+    };
+  },
+  'yandex.com': function(url) {
+    return {
+      engine: 'yandex',
+      key: getSearchKeywords(url, 'text')
+    };
+  },
+  'duckduckgo.com': function(url) {
+    return {
+      engine: 'duckduckgo',
+      key: getSearchKeywords(url, 'q')
+    };
+  },
 };
 
 const enginesKey = Object.keys(engines);
@@ -39,10 +78,13 @@ function getSearchKeywords(url, key) {
 
 function updateSearchKeywords(url) {
   const fun = getSearchKeysFun(url);
-  const searchKey = fun(url);
-  if (searchKey) {
+  const r = fun(url);
+  if (!r) return;
+  const { engine, key } = r;
+  if (key) {
     getSearchKeys().then(keys => {
-      setSearchKeys([searchKey, ...keys].slice(0, MAX_KEYS));
+      const set = new Set([`${engine}^${key}`, ...keys]);
+      setSearchKeys(Array.from(set).slice(0, MAX_KEYS));
     });
   }
 }

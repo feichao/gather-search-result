@@ -1,7 +1,6 @@
 (function() {
   const {
     getGatherResults,
-    setGatherResults,
     deleteGatherResultsByKey,
     deleteGatherResultsItem,
     getTargetElement
@@ -80,7 +79,10 @@
               : `<img src="assets/star-normal.png" alt="" class="star-normal">`;
           }).join('')
         }</div>
-        <div class="create-date">${formatDate(new Date(r.createDate))}</div>
+        <div>
+          <span class="engine">${r.engine}</span>
+          <span class="create-date">${formatDate(new Date(r.createDate))}</span>
+        </div>
         <div class="delete" data-key="${selectedKey}" data-index="${i}"><img src="assets/delete.png" alt="DEL"></div>
       </li>
     `).join('');

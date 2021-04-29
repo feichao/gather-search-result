@@ -42,23 +42,27 @@
     }
   }
 
-  setSatrRate(rate);
-
   function getHoverRate(target) {
     const lis = searchRateEle.children;
     const li = getTargetElement(target, target => (target.tagName || '').toUpperCase() === 'LI');
     return Array.from(lis).indexOf(li);
   }
 
+  function setKeysList(keys) {
+    searchKeyList.innerHTML = keys.map((key) => {
+      const temp = key.indexOf('^');
+      const engine = key.substr(0, temp);
+      const _key = key.substr(temp + 1);
+      return `<li data-engine="${engine}" data-key="${_key}">
+        <span class="engine">${engine}</span>
+        <span>${_key}</span>
+      </li>`;
+    }).join('');
+  }
+
   chrome.storage.onChanged.addListener(function(data) {
-    getGatherKeys().then(keys => {
-      searchKeyList.innerHTML = keys.map((key) => `<li>${key}</li>`).join('');
-    })
+    getGatherKeys().then(keys => setKeysList(keys));
   });
-  
-  getGatherKeys().then(keys => {
-    searchKeyList.innerHTML = keys.map((key) => `<li>${key}</li>`).join('');
-  })
 
   document.body.addEventListener('click', function() {
     searchKeyList.style.display = 'none';
@@ -77,6 +81,7 @@
 
   confirmEle.addEventListener('click', function(event) {
     const searchKey = searchKeyEle.value;
+    const engine = searchKeyEle.dataset['engine'];
     if (!searchKey || isSaved) {
       return;
     }
@@ -84,6 +89,7 @@
     getGatherResults().then(function(rets) {
       const r = {
         rate,
+        engine,
         resultURL,
         resultTitle,
         resultFavIcon,
@@ -134,8 +140,12 @@
   });
 
   searchKeyList.addEventListener('click', function(event) {
-    const target = event.target;
-    searchKeyEle.value = target.innerHTML;
+    const target = getTargetElement(event.target, target => (target.tagName || '').toUpperCase() === 'LI');
+    searchKeyEle.dataset['engine'] = target.dataset['engine'];
+    searchKeyEle.value = target.dataset['key'];
     searchKeyList.style.display = 'none';
   });
+
+  setSatrRate(rate);
+  getGatherKeys().then(keys => setKeysList(keys));
 })();

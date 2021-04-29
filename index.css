@@ -46,7 +46,24 @@ body {
 
 .container .keys {
   border-right: 2px solid #f9f9f9;
+  position: relative;
   width: 360px;
+}
+
+.keys .logo {
+  align-items: center;
+  background: #333;
+  bottom: 0;
+  color: white;
+  display: flex;
+  height: 36px;
+  position: absolute;
+  width: 100%;
+}
+.keys .logo img {
+  height: 24px;
+  margin: 0 8px 0 16px;
+  width: 24px;
 }
 
 .container .results {
@@ -63,7 +80,10 @@ body {
 }
 
 .keys-list {
+  box-sizing: border-box;
   padding: 16px;
+  height: calc(100% - 36px);
+  overflow: auto;
 }
 
 .keys-list li,
@@ -139,6 +159,13 @@ body {
   font-size: 12px;
   margin-top: 8px;
 }
+.results-list li .engine {
+  background: #333;
+  border-radius: 4px;
+  color: white;
+  margin-right: 4px;
+  padding: 4px 6px;
+}
 
 .results-keys {
   border-bottom: 1px solid #eee;
@@ -165,7 +192,7 @@ body {
 }
 
 .rate {
-  margin: 8px 0;
+  margin: 16px 0;
 }
 
 .rate img {

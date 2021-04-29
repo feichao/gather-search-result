@@ -27,6 +27,7 @@
    *        resultFavIcon
    *        resultTitle
    *        resultURL
+   *        engine
    *        createDate
    *      }]
    *    }

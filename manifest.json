@@ -20,6 +20,12 @@
     "tabs",
     "storage"
   ],
+  "content_scripts": [{
+    "matches": ["http://*/*", "https://*/*"],
+    "js": ["page.js"],
+    "css": ["page.css"],
+    "run_at": "document_start"
+  }],
   "options_page": "index.html",
   "homepage_url": "https://github.com/feichao/gather-search-result"
 }

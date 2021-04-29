@@ -42,9 +42,11 @@ iframe[name="iframe-invisible"] {
 }
 
 .keys-list li {
+  align-items: center;
   background: #f5f5f5;
   border-radius: 4px;
   cursor: pointer;
+  display: flex;
   font-size: 0.85em;
   line-height: 1.4;
   margin: 6px 3px;
@@ -52,6 +54,14 @@ iframe[name="iframe-invisible"] {
 }
 .keys-list li:hover {
   background: #eee;
+}
+.keys-list li .engine {
+  background: #333;
+  border-radius: 4px;
+  color: white;
+  margin-left: -4px;
+  margin-right: 2px;
+  padding: 0 4px;
 }
 
 .rates-star-list {
