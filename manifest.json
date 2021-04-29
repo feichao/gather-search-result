@@ -16,12 +16,6 @@
     "default_title": "Gather Search Result",
     "default_popup": "popup.html"
   },
-  "content_scripts": [{
-    "matches": ["http://*/*", "https://*/*"],
-    "js": ["index.js"],
-    "css": ["index.css"],
-    "run_at": "document_start"
-  }],
   "permissions": [
     "tabs",
     "storage"

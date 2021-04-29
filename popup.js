@@ -1,4 +1,19 @@
 (function () {
+  const {
+    getGatherKeys,
+    getGatherResults,
+    setGatherResults,
+    getTargetElement
+  } = window.__GatherSearchResultUtils;
+
+  const MAX_RESULTS = 1000;
+  const confirmEle = document.getElementById('confirm');
+  const gotoGatherList = document.getElementById('goto-gather-list');
+  const searchKeyEle = document.getElementById('keys-input');
+  const searchRateEle = document.getElementById('rates-star-list');
+  const searchKeyList = document.getElementById('keys-list');
+
+  let rate = 4;
   let resultURL = '';
   let resultTitle = '';
   let resultFavIcon = '';
@@ -20,65 +35,6 @@
     }
   });
 
-  const MAX_RESULTS = 1000;
-  const form = document.getElementById('form');
-  const confirmEle = document.getElementById('confirm');
-  const gotoGatherList = document.getElementById('goto-gather-list');
-  const searchKeyEle = document.getElementById('keys-input');
-  const searchRateEle = document.getElementById('rates-star-list');
-  const searchKeyList = document.getElementById('keys-list');
-
-  let rate = 4;
-
-  function getGatherKeys() {
-    return new Promise((resolve, reject) => {
-      chrome.storage.sync.get('gatherKeys', function(data) {
-        const keys = Array.isArray(data.gatherKeys) ? data.gatherKeys : [];
-        resolve(keys);
-      });
-    });
-  }
-
-  /**
-   * gatherResults
-   * {
-   *    [key]: {
-   *      createDate
-   *      results: [{
-   *        rate
-   *        resultFavIcon
-   *        resultTitle
-   *        resultURL
-   *        createDate
-   *      }]
-   *    }
-   */
-  function getGatherResults() {
-    return new Promise((resolve, reject) => {
-      chrome.storage.sync.get('gatherResults', function(data) {
-        resolve(data.gatherResults || {});
-      });
-    });
-  };
-
-  function setGatherResults(gatherResults) {
-    return new Promise((resolve, reject) => {
-      chrome.storage.sync.set({ gatherResults }, function(data) {
-        resolve();
-      });
-    });
-  };
-
-  function getTargetElement(target, tagName) {
-    while(true) {
-      if(target === null || (target.tagName || '').toUpperCase() === tagName.toUpperCase()) {
-        break;
-      }
-      target = target.parentElement;
-    }
-    return target;
-  }
-
   function setSatrRate(rate) {
     const lis = searchRateEle.children;
     for(let i = 0; i < lis.length; i++) {
@@ -87,6 +43,12 @@
   }
 
   setSatrRate(rate);
+
+  function getHoverRate(target) {
+    const lis = searchRateEle.children;
+    const li = getTargetElement(target, target => (target.tagName || '').toUpperCase() === 'LI');
+    return Array.from(lis).indexOf(li);
+  }
 
   chrome.storage.onChanged.addListener(function(data) {
     getGatherKeys().then(keys => {
@@ -103,18 +65,13 @@
   });
 
   searchRateEle.addEventListener('mouseover', function(event) {
-    const lis = searchRateEle.children;
-    const li = getTargetElement(event.target, 'LI');
-    const index = Array.from(lis).indexOf(li);
-    setSatrRate(index);
+    setSatrRate(getHoverRate(event.target));
   });
   searchRateEle.addEventListener('mouseleave', function(event) {
     setSatrRate(rate);
   });
   searchRateEle.addEventListener('click', function(event) {
-    const lis = searchRateEle.children;
-    const li = getTargetElement(event.target, 'LI');
-    rate = Array.from(lis).indexOf(li);
+    rate = getHoverRate(event.target);
     setSatrRate(rate);
   });
 

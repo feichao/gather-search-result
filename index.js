@@ -1,4 +1,12 @@
 (function() {
+  const {
+    getGatherResults,
+    setGatherResults,
+    deleteGatherResultsByKey,
+    deleteGatherResultsItem,
+    getTargetElement
+  } = window.__GatherSearchResultUtils;
+
   const container = document.getElementById('container');
   const emptyContainer = document.getElementById('empty-container');
   const searchKeyEl = document.getElementById('search-keys');
@@ -13,30 +21,14 @@
   let searchKey = '';
   let inputTimer = null;
 
-   /**
-   * gatherResults
-   * {
-   *    [key]: {
-   *      createDate
-   *      results: [{
-   *        rate
-   *        resultFavIcon
-   *        resultTitle
-   *        resultURL
-   *        createDate
-   *      }]
-   *    }
-   */
-   function getGatherResults() {
-    return new Promise((resolve, reject) => {
-      chrome.storage.sync.get('gatherResults', function(data) {
-        resolve(data.gatherResults || {});
-      });
-    });
-  };
+  function prefixNum(num) {
+    return ('0' + num).substr(-2);
+  }
 
   function formatDate(d) {
-    return [d.getFullYear(), d.getMonth() + 1 , d.getDate()].join('/') + ' ' + [d.getHours(), d.getMinutes(), d.getSeconds()].join(':');
+    return [prefixNum(d.getMonth() + 1) , prefixNum(d.getDate()), d.getFullYear()].join('/') 
+      + ' ' 
+      + [prefixNum(d.getHours()), prefixNum(d.getMinutes()), prefixNum(d.getSeconds())].join(':');
   }
 
   function render() {
@@ -53,7 +45,7 @@
         selectedKey = selectedKey || resultsArray[0].key;
         keysListEl.innerHTML = renderKeysHtml(selectedKey, resultsArray);
         resultsKeysEl.innerText = selectedKey;
-        resultsListEl.innerHTML = renderResultsHtml(gatherResults[selectedKey].results);
+        resultsListEl.innerHTML = renderResultsHtml(selectedKey, gatherResults[selectedKey].results);
       } else {
         container.style.display = 'none';
         emptyContainer.style.display = 'flex';
@@ -66,12 +58,13 @@
       <li data-key="${r.key}" class="${r.key === selectedKey ? 'selected' : ''}">
         <div class="key">${r.key}</div>
         <div class="create-date">${formatDate(new Date(r.createDate))}</div>
+        <div class="delete" data-key="${selectedKey}"><img src="assets/delete.png" alt="DEL"></div>
       </li>
     `).join('');
   };
 
-  const renderResultsHtml = function(results) {
-    return results.sort((r1, r2) => r2.rate - r1.rate).map(r => `
+  const renderResultsHtml = function(selectedKey, results) {
+    return results.sort((r1, r2) => r2.rate - r1.rate).map((r, i) => `
       <li>
         <div class="title">
           <img src="${/^http/.test(r.resultFavIcon) ? r.resultFavIcon : 'assets/browser.png'}" alt="ICON">
@@ -87,7 +80,8 @@
               : `<img src="assets/star-normal.png" alt="" class="star-normal">`;
           }).join('')
         }</div>
-        <div class="create-date">${formatDate(new Date(r.createDate))}</di>
+        <div class="create-date">${formatDate(new Date(r.createDate))}</div>
+        <div class="delete" data-key="${selectedKey}" data-index="${i}"><img src="assets/delete.png" alt="DEL"></div>
       </li>
     `).join('');
   };
@@ -109,17 +103,41 @@
   });
 
   keysListEl.addEventListener('click', (event) => {
-    let target = event.target;
-    while(true) {
-      if(target === null || (target.tagName || '').toUpperCase() === 'LI') {
-        break;
+    let target;
+    
+    // delete
+    target = getTargetElement(event.target, target => /delete/.test(target.className));
+    if (target) {
+      event.stopPropagation();
+      const key = target.dataset['key'];
+      if (key === selectedKey) { // delete selected item
+        selectedKey = null;
       }
-      target = target.parentElement;
+      deleteGatherResultsByKey(key).then(render);
+      return;
     }
 
+    // select
+    target = getTargetElement(event.target, target => (target.tagName || '').toUpperCase() === 'LI');
     if (target) {
       selectedKey = target.dataset['key'];
       render();
+      return;
+    }
+  });
+
+  resultsListEl.addEventListener('click', (event) => {
+    let target = getTargetElement(event.target, target => /delete/.test(target.className));
+    if (target) {
+      event.stopPropagation();
+      const key = target.dataset['key'];
+      const index = target.dataset['index'];
+      deleteGatherResultsItem(key, index).then(isDeleteKey => {
+        if (isDeleteKey) {
+          selectedKey = null;
+        }
+        render();
+      });
     }
   });
 
