@@ -83,7 +83,7 @@
           }).join('')
         }</div>
         <div>
-          <span class="engine">${r.engine}</span>
+          <span class="engine">${r.engine || 'google'}</span>
           <span class="create-date">${formatDate(new Date(r.createDate))}</span>
         </div>
         <div class="delete" data-key="${selectedKey}" data-index="${i}"><img src="assets/delete.png" alt="DEL"></div>

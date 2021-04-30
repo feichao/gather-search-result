@@ -81,7 +81,7 @@
 
   confirmEle.addEventListener('click', function(event) {
     const searchKey = searchKeyEle.value;
-    const engine = searchKeyEle.dataset['engine'];
+    const engine = searchKeyEle.dataset['engine'] || 'google';
     if (!searchKey || isSaved) {
       return;
     }
