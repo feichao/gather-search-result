@@ -2,11 +2,24 @@ body {
   margin: 0;
 }
 
+.flex {
+  flex: 1;
+}
+
 .container {
   font-size: 12px;
   margin: 16px 12px;
   min-height: 150px;
   width: 278px;
+}
+
+.header {
+  align-items: center;
+  display: flex;
+}
+
+.header input {
+  display: inline-block;
 }
 
 iframe[name="iframe-invisible"] {
@@ -88,12 +101,7 @@ iframe[name="iframe-invisible"] {
   display: initial;
 }
 
-.item-wrapper > label {
-  margin: 0;
-  width: 42px;
-}
-
-.item-wrapper input {
+.item-wrapper .keys-content input {
   box-sizing: border-box;
   border: 1px solid #ccc;
   border-radius: 4px;

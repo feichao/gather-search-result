@@ -12,7 +12,12 @@
     <iframe name="iframe-invisible"></iframe>
     <form action="#" target="iframe-invisible" autocomplete="off">
       <div class="item-wrapper">
-        <label>Search Keywords</label>
+        <div id="header" class="header">
+          <label>Search Keywords</label>
+          <span class="flex"></span>
+          <input id="keys-source" name="keys-source" type="checkbox" />
+          <label for="keys-source">Saved Keys</label>
+        </div>
         <div class="keys-content">
           <input id="keys-input" required placeholder="search keywords">
           <ul id="keys-list" class="keys-list"></ul>

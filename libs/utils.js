@@ -1,5 +1,7 @@
 (function (global) {
   global.__GatherSearchResultUtils = global.__GatherSearchResultUtils || {
+    getKeySource,
+    setKeySource,
     getGatherKeys,
     getGatherResults,
     setGatherResults,
@@ -7,6 +9,22 @@
     deleteGatherResultsItem,
     getTargetElement
   };
+
+  function getKeySource() {
+    return new Promise((resolve, reject) => {
+      chrome.storage.local.get('gatherKeySource', function(result) {
+        resolve(result.gatherKeySource);
+      });
+    })
+  }
+
+  function setKeySource(value) {
+    return new Promise((resolve, reject) => {
+      chrome.storage.local.set({gatherKeySource: value}, function() {
+        resolve(true);
+      });
+    });
+  }
 
   function getGatherKeys() {
     return new Promise((resolve, reject) => {
